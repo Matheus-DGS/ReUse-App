@@ -1,0 +1,77 @@
+// Schema Prisma do ReUse!
+// Reaproveita o modelo de dados definido na Atividade 01 (PBL - Modelagem de Dados)
+// Entidades: Usuario, Item, Favorito, FotoItem
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id           String     @id @default(cuid())
+  nome         String
+  email        String     @unique
+  senha        String
+  dataCadastro DateTime   @default(now())
+
+  itens        Item[]     @relation("ItensDoUsuario")
+  favoritos    Favorito[]
+
+  @@map("usuarios")
+}
+
+model Item {
+  id              String     @id @default(cuid())
+  nomeItem        String
+  descricao       String
+  categoria       Categoria
+  dataPublicacao  DateTime   @default(now())
+
+  usuarioId       String
+  usuario         Usuario    @relation("ItensDoUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  fotos           FotoItem[]
+  favoritos       Favorito[]
+
+  @@index([categoria])
+  @@map("itens")
+}
+
+model Favorito {
+  id           String   @id @default(cuid())
+  dataFavorito DateTime @default(now())
+
+  usuarioId    String
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  itemId       String
+  item         Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, itemId])
+  @@map("favoritos")
+}
+
+model FotoItem {
+  id         String   @id @default(cuid())
+  urlFoto    String
+  dataUpload DateTime @default(now())
+  principal  Boolean  @default(false)
+
+  itemId     String
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("fotos_item")
+}
+
+enum Categoria {
+  PAPEL
+  PLASTICO
+  VIDRO
+  METAL
+  ORGANICO
+  ELETRONICO
+}

@@ -1,0 +1,142 @@
+.hero {
+  background: linear-gradient(180deg, #eef1e6 0%, var(--fundo) 100%);
+  border-bottom: 1px solid var(--linha);
+}
+
+.heroInner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+  padding-top: 72px;
+  padding-bottom: 72px;
+}
+
+.titulo {
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.05;
+  margin: 14px 0 20px;
+  color: var(--acento-escuro);
+}
+
+.subtitulo {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--tinta-suave);
+  max-width: 46ch;
+  margin: 0 0 28px;
+}
+
+.ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Trilha de triagem — elemento de assinatura da página */
+.trilha {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 36px 28px;
+  background: var(--fundo-card);
+  border: 1px solid var(--linha);
+  border-radius: 20px;
+}
+
+.trilhaLinha {
+  position: absolute;
+  left: 42px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: var(--linha);
+}
+
+.trilhaItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.trilhaPonto {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 6px var(--fundo-card);
+}
+
+.trilhaLabel {
+  font-family: var(--fonte-dado);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--tinta-suave);
+}
+
+.secao {
+  padding: 56px 24px;
+}
+
+.secaoTitulo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.h2 {
+  font-size: 28px;
+  margin-top: 6px;
+}
+
+.contagem {
+  font-family: var(--fonte-dado);
+  font-size: 13px;
+  color: var(--tinta-suave);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.verTodos {
+  display: inline-block;
+  margin-top: 24px;
+  font-weight: 600;
+  color: var(--acento);
+}
+
+.pilares {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.pilarTitulo {
+  font-size: 19px;
+  margin: 10px 0 8px;
+}
+
+.pilarTexto {
+  font-size: 14.5px;
+  color: var(--tinta-suave);
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+  }
+  .grade,
+  .pilares {
+    grid-template-columns: 1fr;
+  }
+}

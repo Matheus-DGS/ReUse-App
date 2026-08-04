@@ -1,0 +1,17 @@
+.pagina {
+  display: flex;
+  justify-content: center;
+  padding: 64px 24px 96px;
+}
+
+.cartao {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px;
+}
+
+.titulo {
+  font-size: 26px;
+  margin: 8px 0 26px;
+  color: var(--acento-escuro);
+}

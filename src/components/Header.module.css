@@ -1,0 +1,59 @@
+.header {
+  border-bottom: 1px solid var(--linha);
+  background: var(--fundo);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.marca {
+  font-family: var(--fonte-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--acento-escuro);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icone {
+  font-size: 20px;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+  font-weight: 500;
+  font-size: 15px;
+  flex: 1;
+}
+
+.nav a:hover {
+  color: var(--acento);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usuario {
+  font-size: 14px;
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 640px) {
+  .nav {
+    display: none;
+  }
+}
