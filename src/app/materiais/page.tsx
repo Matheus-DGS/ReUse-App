@@ -1,55 +1,101 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Categoria } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import ItemCard from "@/components/ItemCard";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, ehCategoria } from "@/lib/categorias";
+import ItemCard from "@/components/materiais/ItemCard";
 import styles from "./materiais.module.css";
 
-type PageProps = {
-  searchParams: { categoria?: string };
+export const metadata: Metadata = {
+  title: "Catálogo de materiais",
+  description: "Consulte materiais recicláveis cadastrados pela comunidade e aprenda a descartá-los.",
 };
 
-export default async function MateriaisPage({ searchParams }: PageProps) {
-  const categoriaFiltro = searchParams.categoria as Categoria | undefined;
+type Props = {
+  searchParams: Promise<{ categoria?: string; q?: string }>;
+};
+
+export default async function MateriaisPage({ searchParams }: Props) {
+  const { categoria, q } = await searchParams;
+  const categoriaFiltro = ehCategoria(categoria) ? categoria : undefined;
+  const busca = q?.trim() ?? "";
 
   const itens = await prisma.item.findMany({
-    where: categoriaFiltro ? { categoria: categoriaFiltro } : undefined,
+    where: {
+      ...(categoriaFiltro ? { categoria: categoriaFiltro } : {}),
+      ...(busca
+        ? {
+            OR: [
+              { nomeItem: { contains: busca, mode: "insensitive" } },
+              { descricao: { contains: busca, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
     orderBy: { dataPublicacao: "desc" },
     include: { fotos: { where: { principal: true }, take: 1 } },
   });
 
+  const hrefCategoria = (chave?: string) => {
+    const params = new URLSearchParams();
+    if (chave) params.set("categoria", chave);
+    if (busca) params.set("q", busca);
+    const query = params.toString();
+    return query ? `/materiais?${query}` : "/materiais";
+  };
+
   return (
     <div className={`wrap ${styles.pagina}`}>
       <header className={styles.cabecalho}>
-        <p className="eyebrow">Catálogo</p>
-        <h1 className={styles.titulo}>Materiais recicláveis</h1>
-        <p className={styles.descricao}>
-          Consulte os materiais cadastrados pela comunidade ReUse!, filtre por categoria e
-          favorite os que forem do seu interesse.
-        </p>
+        <div className="anima-entrada">
+          <p className="eyebrow">Catálogo</p>
+          <h1 className={styles.titulo}>Materiais recicláveis</h1>
+          <p className={styles.descricao}>
+            Consulte os materiais cadastrados pela comunidade ReUse!, filtre por categoria e descubra
+            onde descartar cada um deles.
+          </p>
+        </div>
+        <Link href="/materiais/novo" className="btn btn-primario">
+          + Cadastrar material
+        </Link>
       </header>
 
-      <div className={styles.filtros}>
-        <Link
-          href="/materiais"
-          className={`${styles.filtro} ${!categoriaFiltro ? styles.filtroAtivo : ""}`}
-        >
+      {/* Busca via GET: funciona até sem JavaScript e mantém o filtro na URL */}
+      <form action="/materiais" className={styles.busca} role="search">
+        {categoriaFiltro && <input type="hidden" name="categoria" value={categoriaFiltro} />}
+        <label htmlFor="q" className="visually-hidden">
+          Buscar material
+        </label>
+        <input id="q" name="q" type="search" defaultValue={busca} placeholder="Buscar por nome ou descrição (ex.: garrafa, pilha)" />
+        <button type="submit" className="btn btn-secundario btn-pequeno">
+          Buscar
+        </button>
+      </form>
+
+      <div className={`chips ${styles.filtros}`}>
+        <Link href={hrefCategoria()} className={`chip ${!categoriaFiltro ? "ativo" : ""}`}>
           Todos
         </Link>
         {Object.entries(CATEGORIAS).map(([chave, valor]) => (
-          <Link
-            key={chave}
-            href={`/materiais?categoria=${chave}`}
-            className={`${styles.filtro} ${categoriaFiltro === chave ? styles.filtroAtivo : ""}`}
-          >
+          <Link key={chave} href={hrefCategoria(chave)} className={`chip ${categoriaFiltro === chave ? "ativo" : ""}`}>
+            <span className="ponto-cor" style={{ background: valor.cor }} aria-hidden="true" />
             {valor.label}
           </Link>
         ))}
       </div>
 
+      {categoriaFiltro && (
+        <div className={styles.dica} style={{ "--cor": CATEGORIAS[categoriaFiltro].cor } as React.CSSProperties}>
+          <p>
+            <strong>Como descartar {CATEGORIAS[categoriaFiltro].label.toLowerCase()}:</strong>{" "}
+            {CATEGORIAS[categoriaFiltro].dica}
+          </p>
+          <Link href={`/pontos?material=${categoriaFiltro}`}>Ver pontos de coleta que aceitam →</Link>
+        </div>
+      )}
+
       {itens.length > 0 ? (
         <div className={styles.grade}>
-          {itens.map((item) => (
+          {itens.map((item, i) => (
             <ItemCard
               key={item.id}
               id={item.id}
@@ -57,11 +103,14 @@ export default async function MateriaisPage({ searchParams }: PageProps) {
               descricao={item.descricao}
               categoria={item.categoria}
               foto={item.fotos[0]?.urlFoto}
+              ordem={Math.min(i, 9)}
             />
           ))}
         </div>
       ) : (
-        <p className={styles.vazio}>Nenhum material encontrado para esse filtro.</p>
+        <p className={styles.vazio}>
+          Nenhum material encontrado para esse filtro. <Link href="/materiais/novo">Que tal cadastrar?</Link>
+        </p>
       )}
     </div>
   );

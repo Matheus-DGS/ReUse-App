@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Categoria } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { usuarioAtual } from "@/lib/auth";
+import { ehCategoria } from "@/lib/categorias";
 
 // GET /api/items?categoria=PLASTICO — lista materiais, com filtro opcional de categoria
 export async function GET(req: NextRequest) {
-  const categoria = req.nextUrl.searchParams.get("categoria") as Categoria | null;
+  const categoria = req.nextUrl.searchParams.get("categoria");
 
   const itens = await prisma.item.findMany({
-    where: categoria ? { categoria } : undefined,
+    where: ehCategoria(categoria) ? { categoria } : undefined,
     orderBy: { dataPublicacao: "desc" },
     include: { fotos: true },
   });
@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: "É necessário estar autenticado." }, { status: 401 });
   }
 
-  const { nomeItem, descricao, categoria, urlFoto } = await req.json();
+  const { nomeItem, descricao, categoria, urlFoto } = await req.json().catch(() => ({}));
 
-  if (!nomeItem || !descricao || !categoria) {
+  if (!nomeItem || !descricao || !ehCategoria(categoria)) {
     return NextResponse.json({ erro: "Preencha nome, descrição e categoria." }, { status: 400 });
   }
 

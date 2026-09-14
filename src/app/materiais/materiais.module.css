@@ -1,14 +1,22 @@
 .pagina {
-  padding: 48px 24px 72px;
+  padding-top: 40px;
 }
 
 .cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.cabecalho > div {
   max-width: 60ch;
-  margin-bottom: 28px;
 }
 
 .titulo {
-  font-size: 36px;
+  font-size: clamp(32px, 4.4vw, 42px);
   margin: 10px 0 12px;
   color: var(--acento-escuro);
 }
@@ -19,36 +27,62 @@
   margin: 0;
 }
 
-.filtros {
+.busca {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 32px;
+  align-items: center;
+  padding: 6px 6px 6px 18px;
+  margin-bottom: 14px;
+  background: var(--fundo-card);
+  border: 1.5px solid var(--linha);
+  border-radius: 999px;
+  max-width: 560px;
 }
 
-.filtro {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1.5px solid var(--linha);
-  font-size: 14px;
-  font-weight: 500;
+.busca:focus-within {
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px var(--acento-claro);
+}
+
+.busca input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+  min-width: 0;
+}
+
+.filtros {
+  margin-bottom: 24px;
+}
+
+.dica {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  border-radius: var(--raio);
+  background: var(--fundo-card);
+  border: 1px solid var(--linha);
+  border-left: 5px solid var(--cor);
+}
+
+.dica p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
   color: var(--tinta-suave);
 }
 
-.filtro:hover {
-  border-color: var(--tinta);
-  color: var(--tinta);
-}
-
-.filtroAtivo {
-  background: var(--acento);
-  border-color: var(--acento);
-  color: #fff;
-}
-
-.filtroAtivo:hover {
-  border-color: var(--acento);
-  color: #fff;
+.dica a {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--acento);
+  white-space: nowrap;
 }
 
 .grade {
@@ -62,7 +96,18 @@
   padding: 40px 0;
 }
 
-@media (max-width: 860px) {
+.vazio a {
+  color: var(--acento);
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .grade {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
   .grade {
     grid-template-columns: 1fr;
   }

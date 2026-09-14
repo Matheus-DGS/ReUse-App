@@ -1,38 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { assinarSessao, nomeCookie } from "@/lib/auth";
+import { COOKIE_SESSAO, assinarSessao, opcoesCookie } from "@/lib/sessao";
 
 export async function POST(req: NextRequest) {
-  const { email, senha } = await req.json();
+  const { email, senha } = await req.json().catch(() => ({}));
 
   if (!email || !senha) {
     return NextResponse.json({ erro: "Informe e-mail e senha." }, { status: 400 });
   }
 
-  const usuario = await prisma.usuario.findUnique({ where: { email } });
-  if (!usuario) {
+  const usuario = await prisma.usuario.findUnique({
+    where: { email: String(email).trim().toLowerCase() },
+  });
+  const senhaValida = usuario ? await bcrypt.compare(String(senha), usuario.senha) : false;
+
+  if (!usuario || !senhaValida) {
     return NextResponse.json({ erro: "E-mail ou senha inválidos." }, { status: 401 });
   }
-
-  const senhaValida = await bcrypt.compare(senha, usuario.senha);
-  if (!senhaValida) {
-    return NextResponse.json({ erro: "E-mail ou senha inválidos." }, { status: 401 });
-  }
-
-  const token = assinarSessao({ userId: usuario.id });
 
   const resposta = NextResponse.json({
     usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email },
   });
-
-  resposta.cookies.set(nomeCookie(), token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-
+  resposta.cookies.set(COOKIE_SESSAO, await assinarSessao({ userId: usuario.id }), opcoesCookie);
   return resposta;
 }
